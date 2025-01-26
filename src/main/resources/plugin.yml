@@ -1,0 +1,6 @@
+name: HealthSync
+version: '1.0.0'
+main: it.mitl.healthSync.HealthSync
+api-version: '1.21'
+authors: [ Mitlit ]
+website: https://dev.mitl.it
