@@ -50,16 +50,14 @@ public class Syncing implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         // Handle the event
-        if (Bukkit.getOnlinePlayers().size() <= 1) {
-            // If the server is empty or only the joining player is online, do nothing
-            return;
+        if (Bukkit.getOnlinePlayers().size() <= 1) { // Check if the server is empty
+            return; // Return if the server is empty
         }
 
-        // Pick a random online player that is not the joining player
-        Player joiningPlayer = event.getPlayer();
-        Bukkit.getOnlinePlayers().stream()
-                .filter(player -> !player.equals(joiningPlayer))
-                .findAny().ifPresent(randomPlayer -> joiningPlayer.setHealth(randomPlayer.getHealth()));
+        Player joiningPlayer = event.getPlayer(); // Create a variable to store the joining player
+        Bukkit.getOnlinePlayers().stream() // Get a stream of online players
+                .filter(player -> !player.equals(joiningPlayer)) // Exclude the joining player
+                .findAny().ifPresent(randomPlayer -> joiningPlayer.setHealth(randomPlayer.getHealth())); // Set the joining player's health to the random player's health
 
     }
 
@@ -67,10 +65,10 @@ public class Syncing implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         // Handle the event
         if (isDeathSyncing) return; // Check if a player is already dead
-        isDeathSyncing = true;
-        String deathMessage = event.getDeathMessage();
-        if (deathMessage != null) {
-            plugin.getServer().broadcastMessage(ChatColor.RED + deathMessage);
+        isDeathSyncing = true; // Set the death syncing flag to true
+        String deathMessage = event.getDeathMessage(); // Create a variable to store the death message
+        if (deathMessage != null) { // Check if the death message is not null
+            plugin.getServer().broadcastMessage(ChatColor.RED + deathMessage); // Broadcast the death message in red
         }
         for (Player player : Bukkit.getOnlinePlayers()) { // Loop through all online players
             if (player.equals(event.getEntity())) continue; // Skip the player who died
