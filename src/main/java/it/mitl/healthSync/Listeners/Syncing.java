@@ -15,6 +15,7 @@ public class Syncing implements Listener {
 
     private final JavaPlugin plugin;
     private boolean isDeathSyncing = false;
+    private String deathGuiltyPlayer = "";
 
     public Syncing(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -24,6 +25,7 @@ public class Syncing implements Listener {
     public void onEntityDamageEvent(EntityDamageEvent event) {
         // Handle the event
         if (event.getEntity() instanceof Player eventPlayer) { // Check if the entity is a player
+            if (eventPlayer.isDead()) return; // Ignore the event if the player is dead
             double damage = event.getDamage(); // Set a variable to the damage
             if (eventPlayer.getHealth() - damage <= 0) return; // Check if the player will die
             for (Player player : Bukkit.getOnlinePlayers()) { // Loop through all online players
@@ -38,6 +40,7 @@ public class Syncing implements Listener {
     public void onEntityRegainHealthEvent(EntityRegainHealthEvent event) {
         // Handle the event
         if (event.getEntity() instanceof Player eventPlayer) { // Check if the entity is a player
+            if (eventPlayer.isDead()) return; // Ignore the event if the player is dead
             double health = event.getAmount(); // Set a variable to the health
             for (Player player : Bukkit.getOnlinePlayers()) { // Loop through all online players
                 if (!player.equals(eventPlayer)) { // Exclude the player who triggered the event
@@ -64,8 +67,13 @@ public class Syncing implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         // Handle the event
-        if (isDeathSyncing) return; // Check if a player is already dead
+        if (isDeathSyncing) {
+            // Check if a player is already dead
+            event.setDeathMessage(event.getEntity().getPlayer().getName() + " died because of " + deathGuiltyPlayer); // Change the death message to mention the player who caused the death.
+            return; // Return in order not to cause a death loop.
+        }
         isDeathSyncing = true; // Set the death syncing flag to true
+        deathGuiltyPlayer = event.getEntity().getPlayer().getName(); // Set the death guilty player
         String deathMessage = event.getDeathMessage(); // Create a variable to store the death message
         if (deathMessage != null) { // Check if the death message is not null
             plugin.getServer().broadcastMessage(ChatColor.RED + deathMessage); // Broadcast the death message in red
