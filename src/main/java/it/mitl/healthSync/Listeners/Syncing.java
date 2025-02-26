@@ -2,6 +2,8 @@ package it.mitl.healthSync.Listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,11 +28,23 @@ public class Syncing implements Listener {
         // Handle the event
         if (event.getEntity() instanceof Player eventPlayer) { // Check if the entity is a player
             if (eventPlayer.isDead()) return; // Ignore the event if the player is dead
-            double damage = event.getDamage(); // Set a variable to the damage
+            FileConfiguration config = plugin.getConfig(); // Get the plugin's configuration
+            double damage = event.getFinalDamage(); // Set a variable to the damage
+            if (config.getBoolean("relative_damage")) { // Check if the relative damage is enabled
+                damage = (Math.round(damage / Bukkit.getOnlinePlayers().size())); // Divide the damage by the number of online players
+                event.setDamage(0);
+                eventPlayer.setHealth(eventPlayer.getHealth() - damage);
+            }
             if (eventPlayer.getHealth() - damage <= 0) return; // Check if the player will die
             for (Player player : Bukkit.getOnlinePlayers()) { // Loop through all online players
                 if (!player.equals(eventPlayer)) { // Exclude the player who triggered the event
-                    player.setHealth(player.getHealth() - damage); // Set the player's health to the current health minus the damage
+                    double newHealth = player.getHealth() - damage;
+                    if (newHealth < 0) {
+                        newHealth = 0;
+                    }
+                    player.setHealth(newHealth); // Set the player's health to the current health minus the damage
+                    player.playHurtAnimation(0); // Play the hurt animation
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1); // Play the hurt sound
                 }
             }
         }
@@ -44,7 +58,11 @@ public class Syncing implements Listener {
             double health = event.getAmount(); // Set a variable to the health
             for (Player player : Bukkit.getOnlinePlayers()) { // Loop through all online players
                 if (!player.equals(eventPlayer)) { // Exclude the player who triggered the event
-                    player.setHealth(player.getHealth() + health); // Set the player's health to the current health plus the health
+                    double newHealth = eventPlayer.getHealth() + health;
+                    if (newHealth > 20) { // Check if the player's health will exceed the maximum health
+                        player.setHealth(20); // Set the health to the difference between the maximum health and the player's health
+                    } else
+                        player.setHealth(newHealth); // Set the player's health to the current health plus the health
                 }
             }
         }
