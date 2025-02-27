@@ -2,6 +2,14 @@
 # HealthSync - Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2025-02-27
+
+List of changes for the 1.0.3 release.
+
+### Fixed
+- **Immortality Bug**: Fixed a bug that made players immortal. (really sorry abt that lol)
+- **Lava Bug**: Fixed a bug where lava damage would decrease health at mach 10 speed.
+
 ## [1.0.2] - 2025-02-26
 
 List of changes for the 1.0.2 release.

@@ -29,16 +29,22 @@ public class Syncing implements Listener {
         if (event.getEntity() instanceof Player eventPlayer) { // Check if the entity is a player
             if (eventPlayer.isDead()) return; // Ignore the event if the player is dead
             FileConfiguration config = plugin.getConfig(); // Get the plugin's configuration
-            double damage = event.getFinalDamage(); // Set a variable to the damage
+            double rawDamage = event.getDamage(); // Set a variable to the raw damage
+            double finalDamage = event.getFinalDamage(); // Set a variable to the final damage
             if (config.getBoolean("relative_damage")) { // Check if the relative damage is enabled
-                damage = (Math.round(damage / Bukkit.getOnlinePlayers().size())); // Divide the damage by the number of online players
-                event.setDamage(0);
-                eventPlayer.setHealth(eventPlayer.getHealth() - damage);
+                int playerCount = Bukkit.getOnlinePlayers().size(); // Get the number of online players
+                if (playerCount <= 0) return;
+
+                double scaledFinalDamage = finalDamage / playerCount;
+                double scaledRawDamage = (scaledFinalDamage / finalDamage) * rawDamage;
+
+                event.setDamage(scaledRawDamage);
             }
-            if (eventPlayer.getHealth() - damage <= 0) return; // Check if the player will die
+
+            if (eventPlayer.getHealth() - event.getFinalDamage() <= 0) return; // Check if the player will die
             for (Player player : Bukkit.getOnlinePlayers()) { // Loop through all online players
                 if (!player.equals(eventPlayer)) { // Exclude the player who triggered the event
-                    double newHealth = player.getHealth() - damage;
+                    double newHealth = player.getHealth() - event.getFinalDamage();
                     if (newHealth < 0) {
                         newHealth = 0;
                     }
