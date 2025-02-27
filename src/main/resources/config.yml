@@ -1,5 +1,5 @@
 # HealthSync Configuration
 
 
-# Relative Damage - Splits damage amongst all online players. E.g. 2 players with 5 damage = 2.5 damage each.
-relative_damage: false
+# Split Damage - Splits damage amongst all online players. E.g. 2 players with 5 damage = 2.5 damage each.
+split-damage: false

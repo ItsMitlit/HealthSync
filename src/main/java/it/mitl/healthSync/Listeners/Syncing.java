@@ -31,7 +31,7 @@ public class Syncing implements Listener {
             FileConfiguration config = plugin.getConfig(); // Get the plugin's configuration
             double rawDamage = event.getDamage(); // Set a variable to the raw damage
             double finalDamage = event.getFinalDamage(); // Set a variable to the final damage
-            if (config.getBoolean("relative_damage")) { // Check if the relative damage is enabled
+            if (config.getBoolean("split-damage")) { // Check if split damage is enabled
                 int playerCount = Bukkit.getOnlinePlayers().size(); // Get the number of online players
                 if (playerCount <= 0) return;
 
